@@ -1,0 +1,83 @@
+{
+  "name": "pwd-companion",
+  "description": "A companion application for pwd-racemanager",
+  "author": "Michael Rommel",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@blueprintjs/core": "^3.15.1",
+    "@blueprintjs/datetime": "^3.9.0",
+    "@blueprintjs/icons": "^3.8.0",
+    "@blueprintjs/select": "^3.8.0",
+    "@blueprintjs/table": "^3.5.0",
+    "@blueprintjs/timezone": "^3.4.0",
+    "electron-is-dev": "0.3.0",
+    "electron-log": "^2.2.6",
+    "electron-updater": "^4.0.6",
+    "react": "16.4.2",
+    "react-dom": "16.4.2"
+  },
+  "devDependencies": {
+    "cross-env": "5.1.6",
+    "concurrently": "3.5.1",
+    "electron": "^4.1.4",
+    "electron-builder": "^20.39.0",
+    "electron-react-devtools": "^0.5.3",
+    "eslint-plugin-react": "^7.12.4",
+    "react-devtools": "^3.6.1",
+    "react-scripts": "^2.1.8",
+    "standard": "^11.0.1",
+    "wait-on": "2.1.0"
+  },
+  "build": {
+    "appId": "com.michaelrommel.pwd-companion",
+    "productName": "pwd-companion",
+    "copyright": "(c) 2019 by {author}",
+    "generateUpdatesFilesForAllChannels": true,
+    "directories": {
+      "buildResources": "assets"
+    },
+    "files": [
+      "build/**/*"
+    ],
+    "win": {
+      "target": "nsis-web",
+      "target": "nsis",
+      "publish": {
+        "provider": "generic",
+        "url": "http://127.0.0.1:7654",
+        "channel": "latest"
+      }
+    },
+    "nsis": {
+      "perMachine": false,
+      "oneClick": false,
+      "installerIcon": "assets/installerIcon.ico"
+    },
+    "nsisWeb": {
+      "perMachine": false,
+      "oneClick": false,
+      "installerIcon": "assets/installerIcon.ico"
+    }
+  },
+  "main": "public/electron.js",
+  "homepage": "./",
+  "scripts": {
+    "react-start": "react-scripts start",
+    "react-build": "react-scripts build",
+    "react-test": "react-scripts test --env=jsdom",
+    "react-eject": "react-scripts eject",
+    "react-devtools": "react-devtools",
+    "electron-build": "electron-builder",
+    "release": "npm run react-build && electron-builder",
+    "build": "npm run react-build && npm run electron-build",
+    "start": "concurrently \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\""
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
