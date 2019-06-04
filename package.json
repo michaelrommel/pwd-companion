@@ -19,6 +19,8 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "reflexbox": "^3.0.1",
+    "restify": "^8.3.2",
+    "restify-cors-middleware": "^1.1.1",
     "serialport": "^7.1.5",
     "yup": "^0.27.0"
   },
@@ -27,13 +29,12 @@
     "concurrently": "^4.1.0",
     "cross-env": "^5.2.0",
     "electron": "^5.0.2",
-    "electron-builder": "^20.41.0",
+    "electron-builder": "^20.43.0",
     "electron-react-devtools": "^0.5.3",
     "electron-rebuild": "^1.8.5",
     "react-devtools": "^3.6.1",
     "react-scripts": "^3.0.1",
-    "standard": "^12.0.1",
-    "wait-on": "^3.2.0"
+    "standard": "^12.0.1"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -88,15 +89,15 @@
   "main": "public/electron.js",
   "homepage": "./",
   "scripts": {
-    "react-start": "react-scripts start",
+    "react-start": "cross-env BROWSER=none react-scripts start",
     "react-build": "react-scripts build",
     "react-test": "react-scripts test --env=jsdom",
     "react-eject": "react-scripts eject",
     "react-devtools": "react-devtools",
     "electron-build": "electron-builder",
-    "release": "npm run react-build && electron-builder",
-    "build": "npm run react-build && npm run electron-build",
-    "start": "concurrently \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\""
+    "release": "yarn run react-build && electron-builder",
+    "build": "yarn run react-build && yarn run electron-build",
+    "start": "concurrently \"cross-env BROWSER=none yarn run react-start\" \"electron .\""
   },
   "browserslist": [
     ">0.2%",

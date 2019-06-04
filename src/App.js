@@ -4,7 +4,7 @@ import Panels from './Panels'
 import { rehydrateStateWithLocalStorage, saveStateToLocalStorage } from './localstorageFunctions'
 import './App.css'
 // const { ipcRenderer } = require('electron')
-const { ipcRenderer } = window.require('electron')
+const { ipcRenderer, webFrame } = window.require('electron')
 
 const setupMessaging = (props) => {
   let {
@@ -89,6 +89,7 @@ class App extends Component {
       'changePortList': this.changePortList,
       'setData': this.setData
     })
+    webFrame.setZoomFactor(1.6)
   }
 
   componentWillUnmount () {

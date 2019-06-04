@@ -7,6 +7,8 @@ const Readline = require('@serialport/parser-readline')
 const path = require('path')
 const isDev = require('electron-is-dev')
 
+const network = require('../main/network')
+
 let mainWindow
 let port
 let parser
@@ -79,6 +81,8 @@ const setupApplication = () => {
       }
     }
   })
+  // set up websocket endpoiint and basic REST server
+
 }
 
 const startSerialReader = () => {

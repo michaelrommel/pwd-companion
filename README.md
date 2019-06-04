@@ -12,4 +12,19 @@ and expose the collected information via a REST interface.
 ```yarn build``` will build the React app and package it along the Electron app.
 
 ## Tipps
-To make the React Devtools available run this in the console tab of the Electron-Devtools: `require('electron-react-devtools').install()`
+To make the React Devtools available run this in the console tab of the
+Electron-Devtools: `require('electron-react-devtools').install()`
+
+If you encounter errors while recompiling the serialport module under Windows,
+these settings may help:
+
+```
+npm config set msbuild_path "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
+set npm config set msvs_version 2015 -global
+```
+
+Problem: when running electron-builder the native components are mangled.
+
+"postinstall": "electron-builder install-app-deps"
+
+does not help
