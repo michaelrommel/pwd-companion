@@ -15,19 +15,45 @@
     "electron-is-dev": "^1.1.0",
     "electron-log": "^3.0.6",
     "electron-updater": "^4.0.6",
+    "formik": "^1.5.7",
     "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "reflexbox": "^3.0.1",
+    "serialport": "^7.1.5",
+    "yup": "^0.27.0"
   },
   "devDependencies": {
+    "babel-eslint": "^10.0.1",
     "concurrently": "^4.1.0",
     "cross-env": "^5.2.0",
     "electron": "^5.0.2",
     "electron-builder": "^20.41.0",
     "electron-react-devtools": "^0.5.3",
+    "electron-rebuild": "^1.8.5",
     "react-devtools": "^3.6.1",
     "react-scripts": "^3.0.1",
     "standard": "^12.0.1",
     "wait-on": "^3.2.0"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "standard": {
+    "env": [
+      "mocha"
+    ],
+    "parser": "babel-eslint",
+    "globals": [
+      "describe",
+      "context",
+      "before",
+      "beforeEach",
+      "after",
+      "afterEach",
+      "it",
+      "expect",
+      "fetch"
+    ]
   },
   "build": {
     "appId": "com.michaelrommel.pwd-companion",

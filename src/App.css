@@ -1,4 +1,27 @@
+
+/* General Application classes */
+.App.bp3-dark {
+  background-color: #283042;
+}
+
 .App {
   min-height: 100vh;
+}
+
+.App .bp3-navbar-group .bp3-switch {
+  margin-bottom: 0;
+}
+
+/* The classes for the Navigation Panel */
+.navigation-button {
+  margin: 0px 2px 0px 2px;
+}
+
+.bp3-dark .bp3-navbar.pwd-development {
+  background-color: #3a0b14;
+}
+
+.bp3-navbar.pwd-development {
+  background-color: #ff7777;
 }
 
