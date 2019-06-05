@@ -65,8 +65,10 @@
       "buildResources": "assets"
     },
     "files": [
-      "build/**/*"
+      "build/**/*",
+      "main/**/*"
     ],
+    "npmRebuild": false,
     "win": {
       "target": "nsis",
       "publish": {
