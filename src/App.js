@@ -9,7 +9,7 @@ const { ipcRenderer, webFrame } = window.require('electron')
 const setupMessaging = (props) => {
   let {
     changePortList,
-    setData
+    pushData
   } = props
 
   ipcRenderer.on('serialport-message', (event, msg) => {
@@ -18,7 +18,7 @@ const setupMessaging = (props) => {
       changePortList(arg.portNames)
       console.log('App::setupMessaging::ipcOn: got new portlist', arg.portNames)
     } else if (arg.type === 'data') {
-      setData(arg.data)
+      pushData(arg.data)
       console.log('App::setupMessaging::ipcOn: got new data', arg.data)
     } else {
       console.log('App::setupMessaging::ipcOn: unknown type', arg.type)
@@ -87,9 +87,15 @@ class App extends Component {
     // set up interprocess communication
     setupMessaging({
       'changePortList': this.changePortList,
-      'setData': this.setData
+      'pushData': this.pushData
     })
-    webFrame.setZoomFactor(1.6)
+    // if we could restore a serial port from localstorage
+    // send this to main for initialization
+    if (this.state.serialport) {
+      sendNewPortToMain(this.state.serialport)
+    }
+    // webFrame.setZoomFactor(1.6)
+    webFrame.setZoomFactor(1.0)
   }
 
   componentWillUnmount () {
@@ -117,7 +123,7 @@ class App extends Component {
     this.setState({ 'serialportList': portlist })
   }
 
-  setData = (data) => {
+  pushData = (data) => {
     this.setState({ 'serialdata': data })
   }
 

@@ -19,9 +19,11 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "reflexbox": "^3.0.1",
-    "restify": "^8.3.2",
+    "restify": "^8.3.3",
     "restify-cors-middleware": "^1.1.1",
     "serialport": "^7.1.5",
+    "watershed": "^0.4.0",
+    "winston": "^3.2.1",
     "yup": "^0.27.0"
   },
   "devDependencies": {
@@ -96,7 +98,7 @@
     "react-test": "react-scripts test --env=jsdom",
     "react-eject": "react-scripts eject",
     "react-devtools": "react-devtools",
-    "electron-build": "electron-builder",
+    "electron-build": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder",
     "release": "yarn run react-build && electron-builder",
     "build": "yarn run react-build && yarn run electron-build",
     "start": "concurrently \"cross-env BROWSER=none yarn run react-start\" \"electron .\""

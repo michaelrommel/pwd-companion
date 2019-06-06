@@ -64,36 +64,38 @@ const setupApplication = () => {
       }
       event.reply('serialport-message', JSON.stringify(arg, null, 0))
     } else if (arg.type === 'set') {
-      // set the requested port
-      try {
-        port = new SerialPort(
-          arg.port,
-          { 'baudRate': 57600,
-            'dataBits': 8,
-            'parity': 'none',
-            'stopBits': 1
-          }
-        )
-        parser = port.pipe(new Readline({ delimiter: '\n' }))
-        startSerialReader()
-      } catch (err) {
-        console.log('Electron::main: error opening serial port', arg.port)
-      }
+      startSerialReader(arg.port)
     }
   })
   // set up websocket endpoiint and basic REST server
-
+  logger.info('main::setupApplication: starting network services')
+  network.init()
 }
 
-const startSerialReader = () => {
-  parser.on('data', (chunk) => {
-    console.log(`Received ${chunk.length} bytes of data.`)
-    let arg = {
-      'type': 'data',
-      'data': chunk
-    }
-    mainWindow.webContents.send('serialport-message', JSON.stringify(arg, null, 0))
-  })
+const startSerialReader = (newport) => {
+  // set the requested port
+  try {
+    port = new SerialPort(
+      newport,
+      { 'baudRate': 57600,
+        'dataBits': 8,
+        'parity': 'none',
+        'stopBits': 1
+      }
+    )
+    parser = port.pipe(new Readline({ delimiter: '\n' }))
+
+    parser.on('data', (chunk) => {
+      console.log(`Received ${chunk.length} bytes of serial data`)
+      let arg = {
+        'type': 'data',
+        'data': chunk
+      }
+      mainWindow.webContents.send('serialport-message', JSON.stringify(arg, null, 0))
+    })
+  } catch (err) {
+    console.log('Electron::main: error opening serial port', newport)
+  }
 }
 
 app.on('ready', setupApplication)

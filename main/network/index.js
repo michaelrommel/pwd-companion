@@ -6,6 +6,8 @@ const restify = require('restify')
 const plugins = require('restify').plugins
 const corsplugin = require('restify-cors-middleware')
 
+var ws
+
 var options = {
   handleUpgrades: true
 }
@@ -25,14 +27,14 @@ const cors = corsplugin({
   exposeHeaders: ['Authorization']
 })
 
-async function init (ctx) {
+async function init () {
   server.pre(cors.preflight)
   server.use(cors.actual)
 
   server.use(plugins.bodyParser())
 
   // configure routes
-  //require('./routes')({ server, plugins })
+  require('./routes')({ server, plugins, ws })
 
   // start server
   server.listen(config.PORT)
