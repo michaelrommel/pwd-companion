@@ -88,6 +88,9 @@
       "perMachine": false,
       "oneClick": false,
       "installerIcon": "assets/installerIcon.ico"
+    },
+    "mac": {
+      "gatekeeperAssess": false
     }
   },
   "main": "public/electron.js",
@@ -98,7 +101,7 @@
     "react-test": "react-scripts test --env=jsdom",
     "react-eject": "react-scripts eject",
     "react-devtools": "react-devtools",
-    "electron-build": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder",
+    "electron-build": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false CSC_NAME=\"Michael Rommel (QLZ6Q6Z89R)\" electron-builder",
     "release": "yarn run react-build && electron-builder",
     "build": "yarn run react-build && yarn run electron-build",
     "start": "concurrently \"cross-env BROWSER=none yarn run react-start\" \"electron .\""
