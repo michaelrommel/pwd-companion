@@ -25,3 +25,28 @@
   background-color: #ff7777;
 }
 
+/* The classes for the Inspection Panel */
+.scale {
+  min-height: 100vh;
+}
+
+.scalecontainer {
+  position: relative;
+}
+
+.scalewindow svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  z-index: 2;
+}
+.scale svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  z-index: 1;
+}

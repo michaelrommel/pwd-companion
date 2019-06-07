@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
+import * as logger from 'winston'
+import BrowserConsole from 'winston-transport-browserconsole'
 import Navigation from './Navigation'
 import Panels from './Panels'
 import { rehydrateStateWithLocalStorage, saveStateToLocalStorage } from './localstorageFunctions'
 import './App.css'
-// const { ipcRenderer } = require('electron')
+
 const { ipcRenderer, webFrame } = window.require('electron')
 
 const setupMessaging = (props) => {
@@ -16,12 +18,12 @@ const setupMessaging = (props) => {
     let arg = JSON.parse(msg)
     if (arg.type === 'serialportList') {
       changePortList(arg.portNames)
-      console.log('App::setupMessaging::ipcOn: got new portlist', arg.portNames)
+      logger.info('App::setupMessaging::ipcOn: got new portlist', arg.portNames)
     } else if (arg.type === 'data') {
+      logger.debug('App::setupMessaging::ipcOn: got new data', arg.data)
       pushData(arg.data)
-      console.log('App::setupMessaging::ipcOn: got new data', arg.data)
     } else {
-      console.log('App::setupMessaging::ipcOn: unknown type', arg.type)
+      logger.warn('App::setupMessaging::ipcOn: unknown type', arg.type)
     }
   })
 
@@ -67,33 +69,49 @@ class App extends Component {
       'urlprefix',
       'serialportList'
     ]
+    // configure logger
+    logger.configure({
+      transports: [
+        new BrowserConsole(
+          {
+            'format': logger.format.simple(),
+            'level': 'debug'
+          }
+        )
+      ]
+    })
   }
 
   componentDidMount () {
-    console.log('App: mounted')
+    logger.info('App::cDidMount: mounted')
     // rehydrate the state from local storage to initialize the app
     let newState = rehydrateStateWithLocalStorage('pwd-companion.app', this.state)
     for (let key of this.dontrestore) {
       delete newState[key]
     }
-
     this.setState(newState)
+
     // add event listener to save state to localStorage
     // when user leaves/refreshes the page
     window.addEventListener(
       'beforeunload',
       this.saveStateHandler
     )
+
+    // if we could restore a serial port from localstorage
+    // send this to main for initialization
+    logger.info('App::cDidMount: setting serialport', newState)
+    if (newState.serialport) {
+      logger.info('App::cDidMount: setting serialport to ', newState.serialport)
+      sendNewPortToMain(newState.serialport)
+    }
+
     // set up interprocess communication
     setupMessaging({
       'changePortList': this.changePortList,
       'pushData': this.pushData
     })
-    // if we could restore a serial port from localstorage
-    // send this to main for initialization
-    if (this.state.serialport) {
-      sendNewPortToMain(this.state.serialport)
-    }
+
     // webFrame.setZoomFactor(1.6)
     webFrame.setZoomFactor(1.0)
   }
@@ -124,7 +142,14 @@ class App extends Component {
   }
 
   pushData = (data) => {
-    this.setState({ 'serialdata': data })
+    // data is the raw string from the serial port
+    try {
+      let parsedData = JSON.parse(data)
+      logger.debug('App::pushData: got serial data', parsedData)
+      this.setState({ 'serialdata': parsedData })
+    } catch (err) {
+      logger.error('App::pushData: could not parse serial data')
+    }
   }
 
   changeTheme = () => {

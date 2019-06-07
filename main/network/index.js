@@ -1,7 +1,8 @@
 'use strict'
 
 const MODULE_ID = 'network'
-
+const logger = require('../utils/logger')
+const config = require('../utils/config')
 const restify = require('restify')
 const plugins = require('restify').plugins
 const corsplugin = require('restify-cors-middleware')
@@ -10,10 +11,6 @@ var ws
 
 var options = {
   handleUpgrades: true
-}
-
-var config = {
-  'PORT': 1337
 }
 
 var server = restify.createServer(options)
@@ -38,7 +35,7 @@ async function init () {
 
   // start server
   server.listen(config.PORT)
-  console.log('%s::init: ready. listening on port %d', MODULE_ID, config.PORT)
+  logger.info('%s::init: ready. listening on port %d', MODULE_ID, config.PORT)
 }
 
 module.exports = {

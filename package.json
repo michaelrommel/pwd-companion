@@ -18,12 +18,15 @@
     "formik": "^1.5.7",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-icons": "^3.7.0",
+    "react-svg": "^10.0.6",
     "reflexbox": "^3.0.1",
     "restify": "^8.3.3",
     "restify-cors-middleware": "^1.1.1",
     "serialport": "^7.1.5",
     "watershed": "^0.4.0",
     "winston": "^3.2.1",
+    "winston-transport-browserconsole": "^1.0.1",
     "yup": "^0.27.0"
   },
   "devDependencies": {
@@ -58,6 +61,8 @@
       "fetch"
     ]
   },
+  "main": "main/index.js",
+  "homepage": "./",
   "build": {
     "appId": "com.michaelrommel.pwd-companion",
     "productName": "pwd-companion",
@@ -70,6 +75,7 @@
       "build/**/*",
       "main/**/*"
     ],
+    "extraMetadata": "main/index.js",
     "npmRebuild": false,
     "win": {
       "target": "nsis",
@@ -93,8 +99,6 @@
       "gatekeeperAssess": false
     }
   },
-  "main": "public/electron.js",
-  "homepage": "./",
   "scripts": {
     "react-start": "cross-env BROWSER=none react-scripts start",
     "react-build": "react-scripts build",

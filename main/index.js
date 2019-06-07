@@ -1,19 +1,19 @@
+const MODULE_ID = 'main'
 const { app, BrowserWindow, ipcMain } = require('electron')
 const { autoUpdater } = require('electron-updater')
-const logger = require('electron-log')
 const SerialPort = require('serialport')
 const Readline = require('@serialport/parser-readline')
-
 const path = require('path')
 const isDev = require('electron-is-dev')
 
-const network = require('../main/network')
+// const logger = require('electron-log')
+const logger = require('./utils/logger')
+const network = require('./network')
 
 let mainWindow
 let port
 let parser
 
-logger.transports.file.level = 'debug'
 autoUpdater.logger = logger
 
 function createWindow () {
@@ -24,20 +24,21 @@ function createWindow () {
       minwidth: 800,
       minheight: 600,
       show: true,
+      title: 'pwd-companion',
       icon: path.join(__dirname, '../assets/icon.ico'),
       webPreferences: {
         nodeIntegration: true
       }
     })
-  logger.info('Created Window...')
+  logger.info('%s::createWindow: Created Window...', MODULE_ID)
 
   mainWindow.loadURL(
     isDev
       ? 'http://localhost:3000'
       : `file://${path.join(__dirname, '../build/index.html')}`
   )
-  logger.info('Loaded URL...')
-  mainWindow.webContents.openDevTools()
+  logger.info('%s::createWindow: Loaded URL...', MODULE_ID)
+  if (isDev) mainWindow.webContents.openDevTools()
   // set up a cleanup handler
   mainWindow.on('closed', () => (mainWindow = null))
 }
@@ -47,7 +48,7 @@ const setupApplication = () => {
   createWindow()
   // set up interprocess communication
   ipcMain.on('serialport-message', async (event, msg) => {
-    console.log(msg)
+    logger.info('%s::serialport-message: received renderer-msg: %s', MODULE_ID, msg)
     let arg = JSON.parse(msg)
     if (arg.type === 'query') {
       // render process requests refreshing the list of serial ports
@@ -86,15 +87,18 @@ const startSerialReader = (newport) => {
     parser = port.pipe(new Readline({ delimiter: '\n' }))
 
     parser.on('data', (chunk) => {
-      console.log(`Received ${chunk.length} bytes of serial data`)
+      logger.debug('%s::SerialReader: Received %d bytes of serial data',
+        MODULE_ID, chunk.length)
       let arg = {
         'type': 'data',
         'data': chunk
       }
-      mainWindow.webContents.send('serialport-message', JSON.stringify(arg, null, 0))
+      mainWindow.webContents.send('serialport-message',
+        JSON.stringify(arg, null, 0))
     })
   } catch (err) {
-    console.log('Electron::main: error opening serial port', newport)
+    logger.error('%s::startSerialReader:error opening serial port "%s"',
+      MODULE_ID, newport)
   }
 }
 
