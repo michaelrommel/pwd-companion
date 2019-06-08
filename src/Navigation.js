@@ -7,6 +7,8 @@ class Navigation extends Component {
   // calls the changePanel function in the App component
   toInspect = () => { this.props.changePanel('inspect') }
   toSettings = () => { this.props.changePanel('settings') }
+  changeZoomMinus = () => { this.props.changeZoom('-') }
+  changeZoomPlus = () => { this.props.changeZoom('+') }
 
   render () {
     return (
@@ -23,6 +25,12 @@ class Navigation extends Component {
         <Navbar.Group align={Alignment.RIGHT}>
           <Switch checked={this.props.darktheme} inline label='Dark'
             onChange={this.props.changeTheme} />
+          <Button id='zoomminus' onClick={this.changeZoomMinus} className='navigation-button'
+            intent={Intent.NONE}
+            large={false} type='button' icon='minus' />
+          <Button id='zoomplus' onClick={this.changeZoomPlus} className='navigation-button'
+            intent={Intent.NONE}
+            large={false} type='button' icon='plus' />
           <Button id='settings' onClick={this.toSettings} className='navigation-button'
             intent={this.props.panelId === 'settings' ? Intent.PRIMARY : Intent.NONE}
             large={false} type='button' icon='cog' text='Settings' />

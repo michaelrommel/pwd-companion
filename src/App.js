@@ -54,6 +54,7 @@ class App extends Component {
       'urlprefix': (nodeEnv === 'development')
         ? 'https://pwd-racetrack' : window.location.protocol + '//' + window.location.hostname,
       'panelId': '',
+      'zoomFactor': 1.6,
       'serialport': '',
       'serialportList': [
         {
@@ -62,12 +63,16 @@ class App extends Component {
         }
       ],
       'wsconns': [],
-      'serialdata': ''
+      'serialdata': {
+        'rfid': '04785CC22D4D81',
+        'weight': 141.4
+      }
     }
     this.dontrestore = [
       'environment',
       'urlprefix',
-      'serialportList'
+      'serialportList',
+      'serialdata'
     ]
     // configure logger
     logger.configure({
@@ -113,7 +118,7 @@ class App extends Component {
     })
 
     // webFrame.setZoomFactor(1.6)
-    webFrame.setZoomFactor(1.0)
+    webFrame.setZoomFactor(this.state.zoomFactor)
   }
 
   componentWillUnmount () {
@@ -152,6 +157,17 @@ class App extends Component {
     }
   }
 
+  changeZoomFactor = (plusminus) => {
+    let factor
+    if (plusminus === '+') {
+      factor = this.state.zoomFactor + 0.1
+    } else {
+      factor = this.state.zoomFactor - 0.1
+    }
+    this.setState({ 'zoomFactor': factor })
+    webFrame.setZoomFactor(factor)
+  }
+
   changeTheme = () => {
     this.setState((state, props) => ({
       'darktheme': !state.darktheme
@@ -165,6 +181,7 @@ class App extends Component {
           className={`pwd-${this.state.environment}`}
           changeTheme={this.changeTheme}
           changePanel={this.changePanel}
+          changeZoom={this.changeZoomFactor}
           environment={this.state.environment}
           darktheme={this.state.darktheme}
           panelId={this.state.panelId}

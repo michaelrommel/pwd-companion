@@ -26,15 +26,17 @@
 }
 
 /* The classes for the Inspection Panel */
-.scale {
-  min-height: 100vh;
+.carcards {
+  font-size: 2em;
 }
 
 .scalecontainer {
   position: relative;
+  max-height: 70vh;
+  overflow: hidden;
 }
-
-.scalewindow svg {
+/*
+div.scalewindow {
   position: absolute;
   top: 0;
   left: 0;
@@ -42,11 +44,23 @@
   height: auto;
   z-index: 2;
 }
-.scale svg {
+
+div.scalewindow svg {
+  width: 100%;
+  height: auto;
+  min-height: 90vh;
+  z-index: 2;
+}
+
+div.scale {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: auto;
-  z-index: 1;
+}
+*/
+svg.scale {
+  width: 100%;
+  height: auto;
 }
