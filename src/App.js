@@ -65,7 +65,7 @@ class App extends Component {
       'wsconns': [],
       'serialdata': {
         'rfid': '04785CC22D4D81',
-        'weight': 141.4
+        'weight': 141.35
       }
     }
     this.dontrestore = [
@@ -150,6 +150,7 @@ class App extends Component {
     // data is the raw string from the serial port
     try {
       let parsedData = JSON.parse(data)
+      if (parsedData.rfid === '') parsedData.rfid = '-'
       logger.debug('App::pushData: got serial data', parsedData)
       this.setState({ 'serialdata': parsedData })
     } catch (err) {
