@@ -25,21 +25,36 @@ const SerialportSelector = (props) => {
   } = props
 
   let serialportList = initialValues.serialportList
+  let themeList = [
+    {
+      'label': 'Vehicles',
+      'path': '/scale-vehicles.plain.svg'
+    },
+    {
+      'label': 'People',
+      'path': '/scale-people.plain.svg'
+    }
+  ]
 
-  const handleChange = (e) => {
+  const handlePortChange = (e) => {
     console.log('RadioGroup:', util.inspect(e))
     setFieldValue('serialport', e.currentTarget.value)
+  }
+
+  const handleThemeChange = (e) => {
+    console.log('RadioGroup:', util.inspect(e))
+    setFieldValue('scaletheme', e.currentTarget.value)
   }
 
   return (
     <Form>
       <Flex p={2}>
-        <Box w={1}>
+        <Box w={1 / 2}>
           <RadioGroup
             large
             id={'serialport'}
             label={'Serialport'}
-            onChange={handleChange}
+            onChange={handlePortChange}
             selectedValue={values.serialport}
           >
             {serialportList.map((port) => (
@@ -47,6 +62,23 @@ const SerialportSelector = (props) => {
                 key={port.comName}
                 label={`${port.comName} (${port.manufacturer})`}
                 value={port.comName}
+              />
+            ))}
+          </RadioGroup>
+        </Box>
+        <Box w={1 / 2}>
+          <RadioGroup
+            large
+            id={'scaletheme'}
+            label={'Scale Theme'}
+            onChange={handleThemeChange}
+            selectedValue={values.scaletheme}
+          >
+            {themeList.map((theme) => (
+              <Radio
+                key={theme.label}
+                label={`${theme.label}`}
+                value={theme.path}
               />
             ))}
           </RadioGroup>
@@ -68,6 +100,7 @@ const SerialportSelector = (props) => {
 class SettingsFormContainer extends Component {
   onSubmit = async (values, actions) => {
     this.props.changePort(values.serialport)
+    this.props.changeScaleTheme(values.scaletheme)
     this.showToast('Successfully saved the settings.',
       Intent.SUCCESS, 'tick-circle')
     actions.setSubmitting(false)
@@ -110,6 +143,7 @@ class SettingsPanel extends Component {
               urlprefix={this.props.urlprefix}
               settings={this.props.settings}
               changePort={this.props.changePort}
+              changeScaleTheme={this.props.changeScaleTheme}
             />
           </Box>
         </Flex>

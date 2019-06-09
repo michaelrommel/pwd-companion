@@ -55,6 +55,7 @@ class App extends Component {
         ? 'https://pwd-racetrack' : window.location.protocol + '//' + window.location.hostname,
       'panelId': '',
       'zoomFactor': 1.6,
+      'scaletheme': '/scale-people.plain.svg',
       'serialport': '',
       'serialportList': [
         {
@@ -146,6 +147,10 @@ class App extends Component {
     this.setState({ 'serialportList': portlist })
   }
 
+  changeScaleTheme = (theme) => {
+    this.setState({ 'scaletheme': theme })
+  }
+
   pushData = (data) => {
     // data is the raw string from the serial port
     try {
@@ -191,9 +196,11 @@ class App extends Component {
           panelId={this.state.panelId}
           urlprefix={this.state.urlprefix}
           changePort={this.changePort}
+          changeScaleTheme={this.changeScaleTheme}
           settings={{
             'serialport': this.state.serialport,
-            'serialportList': this.state.serialportList
+            'serialportList': this.state.serialportList,
+            'scaletheme': this.state.scaletheme
           }}
           serialdata={this.state.serialdata}
         />

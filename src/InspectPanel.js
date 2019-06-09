@@ -93,7 +93,7 @@ class InspectPanel extends Component {
         </Flex>
         <Flex w={1} p={0} align='stretch' className='scalecontainer'>
           <Box w={1} p={1}>
-            <SvgLoader className='scale' path='/circle-with-carimages-scale-clipped.plain.svg'>
+            <SvgLoader className='scale' path={this.props.scaletheme}>
               <TransformMotion
                 selector='#completescale'
                 start={{
@@ -101,14 +101,14 @@ class InspectPanel extends Component {
                   y: 0,
                   angle: this.state.previousRotation,
                   rotateX: 250,
-                  rotateY: 414.7
+                  rotateY: 252.5
                 }}
                 target={{
                   x: 0,
                   y: 0,
                   angle: this.state.currentRotation,
                   rotateX: 250,
-                  rotateY: 414.7
+                  rotateY: 252.5
                 }}
               />
             </SvgLoader>
