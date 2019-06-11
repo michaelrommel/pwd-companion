@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import util from 'util'
 import * as Yup from 'yup'
 import { RadioGroup, Radio, Intent, Button } from '@blueprintjs/core'
 import { Formik, Form } from 'formik'
@@ -37,12 +36,10 @@ const SerialportSelector = (props) => {
   ]
 
   const handlePortChange = (e) => {
-    console.log('RadioGroup:', util.inspect(e))
     setFieldValue('serialport', e.currentTarget.value)
   }
 
   const handleThemeChange = (e) => {
-    console.log('RadioGroup:', util.inspect(e))
     setFieldValue('scaletheme', e.currentTarget.value)
   }
 

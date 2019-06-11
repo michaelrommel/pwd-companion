@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Callout, Intent } from '@blueprintjs/core'
+import { Button, Callout, Intent } from '@blueprintjs/core'
 // import ReactSVG from 'react-svg'
 // import { SvgLoader, TransformMotion } from 'react-svgmt'
 import { SvgLoader, SvgProxy } from 'react-svgmt'
@@ -7,7 +7,6 @@ import { Motion, spring } from 'react-motion'
 import * as logger from 'winston'
 import { Flex, Box } from 'reflexbox'
 import { FaBalanceScale } from 'react-icons/fa'
-import memoizeOne from 'memoize-one'
 
 const TransformMotion = props => (
   <Motion
@@ -31,14 +30,36 @@ class InspectPanel extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      scaleTransformation: '',
-      previousRotation: 0,
-      currentRotation: 0
+      rotation: {
+        'from': 0,
+        'to': 0
+      }
     }
   }
 
-  updateScale = (weight) => {
-    console.log('InspectPanel::updateScale: new weight is', weight)
+  componentDidMount = () => {
+    this.setState({
+      'rotation': {
+        'from': this.state.rotation.to,
+        'to': this.scaleRotation(this.props.serialdata.weight)
+      }
+    })
+  }
+
+  componentDidUpdate = (prevProps, prevState) => {
+    logger.debug('InspectPanel::cDU:', this.props.serialdata)
+    if (prevProps.serialdata.weight !== this.props.serialdata.weight) {
+      this.setState({
+        'rotation': {
+          'from': this.state.rotation.to,
+          'to': this.scaleRotation(this.props.serialdata.weight)
+        }
+      })
+    }
+  }
+
+  scaleRotation = (weight) => {
+    console.log('InspectPanel::scaleRotaton: new weight is', weight)
     let rotation
     if (weight < 120) {
       rotation = 0
@@ -47,25 +68,23 @@ class InspectPanel extends Component {
     } else {
       rotation = -1 * Math.round(((weight - 120) * 6) * 10) / 10
     }
-    this.setState({ 'previousRotation': this.state.currentRotation })
-    this.setState({ 'currentRotation': rotation })
+    return rotation
   }
-
-  memoizeUpdateScale = memoizeOne(
-    (p) => {
-      console.log('InspectPanel::memoizedUpdateScale: props are', p)
-      this.updateScale(p)
-    }
-  )
 
   render () {
     const panelActive = this.props.active ? {} : { 'display': 'none' }
     const rfid = this.props.serialdata ? this.props.serialdata.rfid : '-'
     const weight = this.props.serialdata ? this.props.serialdata.weight : 0
-    const scale = <span className='bp3-icon'><FaBalanceScale size='0.8em' /></span>
+    const temperature = this.props.serialdata ? Math.round(this.props.serialdata.temp, 0) : 0
+    const scaleIcon = <span className='bp3-icon'><FaBalanceScale size='0.8em' /></span>
+
+    const weightTitle = 'Weight' + (
+      (temperature > 0)
+        ? ' (at ' + temperature.toFixed(0) + '°C)'
+        : ''
+    )
 
     logger.debug('InspectPanel::render:', this.props)
-    this.memoizeUpdateScale(weight, rfid)
 
     return (
       <div className='inspectpanel' style={panelActive}>
@@ -80,12 +99,34 @@ class InspectPanel extends Component {
               {rfid}
             </Callout>
           </Box>
+          <Box w={2 / 10} p={3}>
+            <Box px={1}>
+              <Button
+                id='tare'
+                onClick={this.props.sendTare}
+                intent={Intent.PRIMARY}
+                text='Tare'
+                type='button'
+                fill
+              />
+            </Box>
+            <Box p={1}>
+              <Button
+                id='calibration'
+                onClick={this.props.sendCalibration}
+                intent={Intent.WARNING}
+                text='142'
+                type='button'
+                fill
+              />
+            </Box>
+          </Box>
           <Box w={4 / 10} p={3}>
             <Callout
               className='carcards'
               intent={Intent.NONE}
-              icon={scale}
-              title='Weight'
+              icon={scaleIcon}
+              title={weightTitle}
             >
               {weight}
             </Callout>
@@ -99,14 +140,14 @@ class InspectPanel extends Component {
                 start={{
                   x: 0,
                   y: 0,
-                  angle: this.state.previousRotation,
+                  angle: this.state.rotation.from,
                   rotateX: 250,
                   rotateY: 252.5
                 }}
                 target={{
                   x: 0,
                   y: 0,
-                  angle: this.state.currentRotation,
+                  angle: this.state.rotation.to,
                   rotateX: 250,
                   rotateY: 252.5
                 }}

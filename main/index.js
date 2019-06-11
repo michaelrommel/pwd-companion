@@ -66,6 +66,9 @@ const setupApplication = () => {
       event.reply('serialport-message', JSON.stringify(arg, null, 0))
     } else if (arg.type === 'set') {
       startSerialReader(arg.port)
+    } else if (arg.type === 'cmd') {
+      port.write(JSON.stringify(arg.data))
+      logger.debug('%s::serialport-message: %s', MODULE_ID, JSON.stringify(arg.data))
     }
   })
   // set up websocket endpoiint and basic REST server
@@ -89,6 +92,7 @@ const startSerialReader = (newport) => {
     parser.on('data', (chunk) => {
       logger.debug('%s::SerialReader: Received %d bytes of serial data',
         MODULE_ID, chunk.length)
+      logger.debug(chunk)
       let arg = {
         'type': 'data',
         'data': chunk

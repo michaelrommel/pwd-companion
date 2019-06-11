@@ -7,9 +7,10 @@ class Panels extends Component {
     return (
       <React.Fragment>
         <InspectPanel active={this.props.panelId === 'inspect'}
-          urlprefix={this.props.urlprefix}
           serialdata={this.props.serialdata}
           scaletheme={this.props.settings.scaletheme}
+          sendTare={this.props.sendTare}
+          sendCalibration={this.props.sendCalibration}
         />
         <SettingsPanel active={this.props.panelId === 'settings'}
           settings={this.props.settings}

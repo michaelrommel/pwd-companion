@@ -41,6 +41,29 @@ const sendNewPortToMain = (port) => {
   console.log('App::sendNewPortToMain: sent set port request', arg.port)
 }
 
+const sendTareToMain = () => {
+  let arg = {
+    'type': 'cmd',
+    'data': {
+      'c': 't'
+    }
+  }
+  ipcRenderer.send('serialport-message', JSON.stringify(arg, null, 2))
+  console.log('App::sendTareToMain: sent tare command')
+}
+
+const sendCalibrationToMain = () => {
+  let arg = {
+    'type': 'cmd',
+    'data': {
+      'c': 'c',
+      'w': 142
+    }
+  }
+  ipcRenderer.send('serialport-message', JSON.stringify(arg, null, 2))
+  console.log('App::sendCalibrationToMain: sent calibration command')
+}
+
 class App extends Component {
   constructor (props) {
     super(props)
@@ -55,7 +78,7 @@ class App extends Component {
         ? 'https://pwd-racetrack' : window.location.protocol + '//' + window.location.hostname,
       'panelId': '',
       'zoomFactor': 1.6,
-      'scaletheme': '/scale-people.plain.svg',
+      'scaletheme': '',
       'serialport': '',
       'serialportList': [
         {
@@ -151,11 +174,22 @@ class App extends Component {
     this.setState({ 'scaletheme': theme })
   }
 
+  sendTare = () => {
+    sendTareToMain()
+  }
+
+  sendCalibration = () => {
+    sendCalibrationToMain()
+  }
+
   pushData = (data) => {
     // data is the raw string from the serial port
     try {
       let parsedData = JSON.parse(data)
       if (parsedData.rfid === '') parsedData.rfid = '-'
+      // lets get a better readable fielname
+      parsedData.weight = parsedData.wght
+      delete parsedData.wght
       logger.debug('App::pushData: got serial data', parsedData)
       this.setState({ 'serialdata': parsedData })
     } catch (err) {
@@ -197,6 +231,8 @@ class App extends Component {
           urlprefix={this.state.urlprefix}
           changePort={this.changePort}
           changeScaleTheme={this.changeScaleTheme}
+          sendTare={this.sendTare}
+          sendCalibration={this.sendCalibration}
           settings={{
             'serialport': this.state.serialport,
             'serialportList': this.state.serialportList,

@@ -12,6 +12,9 @@
 /build
 /dist
 
+# firmware builds
+*build-pro-*
+
 # misc
 .DS_Store
 .env.local
