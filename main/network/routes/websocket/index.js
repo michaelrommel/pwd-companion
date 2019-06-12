@@ -15,6 +15,6 @@ function attachWS (req, res, next) {
   next(false)
 }
 
-module.exports = (server, websocket) => {
-  server.get('/websocket/attach', attachWS)
+module.exports = (ctx) => {
+  ctx.server.get('/websocket/attach', attachWS)
 }

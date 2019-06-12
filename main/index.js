@@ -4,25 +4,50 @@ const { autoUpdater } = require('electron-updater')
 const SerialPort = require('serialport')
 const Readline = require('@serialport/parser-readline')
 const path = require('path')
+const util = require('util')
+const nwlib = require('network')
+
 const isDev = require('electron-is-dev')
 
 // const logger = require('electron-log')
 const logger = require('./utils/logger')
+const measurement = require('./utils/measurement')
 const network = require('./network')
 
-let mainWindow
-let port
-let parser
+// send my own IP address to the renderer process
+const getPrivateIp = util.promisify(nwlib.get_private_ip)
+const sendMyIp = () => {
+  getPrivateIp().then((ip) => {
+    let arg = {
+      'type': 'networkinfo',
+      'ip': ip
+    }
+    mainWindow.webContents.send('serialport-message',
+      JSON.stringify(arg, null, 0))
+  })
+}
 
+// global handle for the main window
+let mainWindow
+// selected port instance
+let port
+// global parser object for the serial line parser
+let parser
+// context to send downstream to other modules
+let ctx = {}
+
+// set the logger for the autoUpdater
 autoUpdater.logger = logger
 
 function createWindow () {
   autoUpdater.checkForUpdatesAndNotify()
   mainWindow = new BrowserWindow(
-    { width: 2200,
-      height: 1300,
-      minwidth: 800,
-      minheight: 600,
+    // { width: 2200,
+    //   height: 1300,
+    { width: 768,
+      height: 480,
+      minwidth: 768,
+      minheight: 480,
       show: true,
       title: 'pwd-companion',
       icon: path.join(__dirname, '../assets/icon.ico'),
@@ -34,7 +59,7 @@ function createWindow () {
 
   mainWindow.loadURL(
     isDev
-      ? 'http://localhost:3000'
+      ? 'http://localhost:3001'
       : `file://${path.join(__dirname, '../build/index.html')}`
   )
   logger.info('%s::createWindow: Loaded URL...', MODULE_ID)
@@ -73,7 +98,8 @@ const setupApplication = () => {
   })
   // set up websocket endpoiint and basic REST server
   logger.info('main::setupApplication: starting network services')
-  network.init()
+  network.init(ctx)
+  sendMyIp()
 }
 
 const startSerialReader = (newport) => {
@@ -92,7 +118,8 @@ const startSerialReader = (newport) => {
     parser.on('data', (chunk) => {
       logger.debug('%s::SerialReader: Received %d bytes of serial data',
         MODULE_ID, chunk.length)
-      logger.debug(chunk)
+      let serialData = JSON.parse(chunk)
+      measurement.setLastMeasurement(serialData)
       let arg = {
         'type': 'data',
         'data': chunk

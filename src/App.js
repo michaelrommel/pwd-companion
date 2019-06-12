@@ -11,7 +11,8 @@ const { ipcRenderer, webFrame } = window.require('electron')
 const setupMessaging = (props) => {
   let {
     changePortList,
-    pushData
+    pushData,
+    setIp
   } = props
 
   ipcRenderer.on('serialport-message', (event, msg) => {
@@ -22,6 +23,9 @@ const setupMessaging = (props) => {
     } else if (arg.type === 'data') {
       logger.debug('App::setupMessaging::ipcOn: got new data', arg.data)
       pushData(arg.data)
+    } else if (arg.type === 'networkinfo') {
+      logger.debug('App::setupMessaging::ipcOn: got networkinfo', arg.ip)
+      setIp(arg.ip)
     } else {
       logger.warn('App::setupMessaging::ipcOn: unknown type', arg.type)
     }
@@ -86,10 +90,13 @@ class App extends Component {
           'manufacturer': 'Unknown'
         }
       ],
+      'ip': '',
       'wsconns': [],
       'serialdata': {
-        'rfid': '04785CC22D4D81',
-        'weight': 141.35
+        'rfid': '-',
+        'weight': 0
+        // 'rfid': '04785CC22D4D81',
+        // 'weight': 141.35
       }
     }
     this.dontrestore = [
@@ -138,7 +145,8 @@ class App extends Component {
     // set up interprocess communication
     setupMessaging({
       'changePortList': this.changePortList,
-      'pushData': this.pushData
+      'pushData': this.pushData,
+      'setIp': this.setIp
     })
 
     // webFrame.setZoomFactor(1.6)
@@ -180,6 +188,10 @@ class App extends Component {
 
   sendCalibration = () => {
     sendCalibrationToMain()
+  }
+
+  setIp = (ip) => {
+    this.setState({ 'ip': ip })
   }
 
   pushData = (data) => {
@@ -225,6 +237,7 @@ class App extends Component {
           environment={this.state.environment}
           darktheme={this.state.darktheme}
           panelId={this.state.panelId}
+          ip={this.state.ip}
         />
         <Panels
           panelId={this.state.panelId}

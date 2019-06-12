@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Switch, Navbar, Button, Alignment, Intent } from '@blueprintjs/core'
+import { Tag, Switch, Navbar, Button, Alignment, Intent } from '@blueprintjs/core'
 
 class Navigation extends Component {
   // helper functions to switch between panels, unfortunately I haven't
@@ -23,6 +23,7 @@ class Navigation extends Component {
             large={false} type='button' icon='search' text='Car Inspector' />
         </Navbar.Group>
         <Navbar.Group align={Alignment.RIGHT}>
+          <Tag className='ip-tag' round minimal>{this.props.ip}</Tag>
           <Switch checked={this.props.darktheme} inline label='Dark'
             onChange={this.props.changeTheme} />
           <Button id='zoomminus' onClick={this.changeZoomMinus} className='navigation-button'

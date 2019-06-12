@@ -27,11 +27,11 @@ const SerialportSelector = (props) => {
   let themeList = [
     {
       'label': 'Vehicles',
-      'path': '/scale-vehicles.plain.svg'
+      'path': './scale-vehicles.plain.svg'
     },
     {
       'label': 'People',
-      'path': '/scale-people.plain.svg'
+      'path': './scale-people.plain.svg'
     }
   ]
 

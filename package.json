@@ -2,9 +2,10 @@
   "name": "pwd-companion",
   "description": "A companion application for pwd-racemanager",
   "author": "Michael Rommel",
-  "version": "0.1.0",
+  "version": "0.2.0-beta",
   "license": "MIT",
-  "private": true,
+  "repository": "github:michaelrommel/pwd-companion",
+  "private": false,
   "dependencies": {
     "@blueprintjs/core": "^3.15.1",
     "@blueprintjs/datetime": "^3.9.1",
@@ -17,6 +18,7 @@
     "electron-updater": "^4.0.6",
     "formik": "^1.5.7",
     "memoize-one": "^5.0.4",
+    "network": "^0.4.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-icons": "^3.7.0",
@@ -79,13 +81,19 @@
     ],
     "extraMetadata": "main/index.js",
     "npmRebuild": false,
-    "win": {
-      "target": "nsis",
-      "publish": {
+    "detectUpdateChannel": true,
+    "publish": [
+      {
+        "provider": "github"
+      },
+      {
         "provider": "generic",
         "url": "http://127.0.0.1:7654",
         "channel": "latest"
       }
+    ],
+    "win": {
+      "target": "nsis"
     },
     "nsis": {
       "perMachine": false,
@@ -102,7 +110,7 @@
     }
   },
   "scripts": {
-    "react-start": "cross-env BROWSER=none react-scripts start",
+    "react-start": "cross-env BROWSER=none PORT=3001 react-scripts start",
     "react-build": "react-scripts build",
     "react-test": "react-scripts test --env=jsdom",
     "react-eject": "react-scripts eject",
@@ -110,7 +118,8 @@
     "electron-build": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false CSC_NAME=\"Michael Rommel (QLZ6Q6Z89R)\" electron-builder",
     "release": "yarn run react-build && electron-builder",
     "build": "yarn run react-build && yarn run electron-build",
-    "start": "concurrently \"cross-env BROWSER=none yarn run react-start\" \"electron .\""
+    "start": "concurrently \"cross-env BROWSER=none yarn run react-start\" \"electron .\"",
+    "github": "electron-builder --publish always"
   },
   "browserslist": [
     ">0.2%",
