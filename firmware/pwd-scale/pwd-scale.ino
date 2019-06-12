@@ -6,7 +6,7 @@
 #include "ScaleData.h"
 #include "util.h"
 
-#define SCALE_VERSION "0.1.4"
+#define SCALE_VERSION "0.2.0"
 
 #define MFRC522_RST_PIN 9
 #define MFRC522_SS_PIN 10
@@ -34,9 +34,9 @@ int weightIndex = 0;
 // delay in milliseconds for temperature sensor readings
 const unsigned long tempInterval = 3000;
 // reporting interval in ms while reading
-const unsigned long reportingInterval = 400;
+const unsigned long reportingInterval = 500;
 // max number of milliseconds to read out the loadcell before shutting it down
-const unsigned long maxTimeOn = 50000;
+const unsigned long maxTimeOn = 20000;
 // after which many seconds to stop reporting after tare or calibration
 // if no rfid can be detected
 const unsigned long maxReporting  = 60000;
@@ -45,7 +45,7 @@ const int removalThreshold = 2;
 // flag if the previous rfid detection was true or false
 bool previousDetection = false;
 // global variable for the calibration factor
-float calibrationFactor = 2090.0;
+float calibrationFactor = 2085.0;
 // remember if a rfid chip is present
 bool rfidIsPresent = false;
 // remember if we should be continuously reporting or waiting for a command
@@ -104,6 +104,7 @@ void setup() {
 void loop() {
   unsigned long now = millis();
 
+  //Serial.println("loop");
   if ( comHost.available() ) {
     // read and process the serial command
     bool res = comHost.receiveCommand( &command );
@@ -162,13 +163,15 @@ void loop() {
         removalCounter++;
       }
       if (removalCounter > removalThreshold) {
+        // stop the reader
+        RfidReader.PICC_HaltA();
+        RfidReader.PCD_StopCrypto1();
+        // reset counters
         rfidIsPresent = false;
         removalCounter = 0;
         // reset continuous reporting
         shallBeStopped = true;
-        // stop the reader
-        RfidReader.PICC_HaltA();
-        RfidReader.PCD_StopCrypto1();
+        stopTare = 0;
         // stop loadcell
         stopCell = now - 1;
         //Serial.println("stopping bc rfid removal");
@@ -192,15 +195,18 @@ void loop() {
         } else {
           Util::printToHex( measurement.rfid, RfidReader.uid.uidByte, RfidReader.uid.size );
         }
-
         LoadCell.power_up();
         isReporting = true;
         rfidIsPresent = true;
+        removalCounter = 0;
+        shallBeStopped = false;
         stopTare = 0;
         // remember time to stop the loadcell
         stopCell = now + maxTimeOn;
         // set time for temperature readings
         timeForTemp = now + tempInterval;
+        //Serial.print("shallbestopped is:");
+        //Serial.println(shallBeStopped);
       }
     }
   }
@@ -219,8 +225,8 @@ void loop() {
       // loadcell is still running
       // abort if after 500ms the scale is not responding
       if (LoadCell.wait_ready_timeout(500)) {
-        // get average over 5 readings
-        float newMeasurement = LoadCell.get_units(5);
+        // get average over 3 readings
+        float newMeasurement = LoadCell.get_units(1);
         // store the measurement into the array
         weightMeasures[weightIndex] = newMeasurement;
         // increment index
@@ -231,20 +237,18 @@ void loop() {
       }
       // get the average and build a sensible value for
       // reporting
-      float sum = 0;
-      int validCount = 0;
-      for (int i=0; i<weightLength; i++) {
-        if (weightMeasures[i] != -1) {
-          // this seems a valid measurement
-          validCount++;
-          sum = sum + weightMeasures[i];
-        }
+      measurement.weight = Util::getAverage(weightMeasures, weightLength);
+      measurement.stddev = Util::getStdDeviation(weightMeasures, weightLength);
+      measurement.calibrationFactor = calibrationFactor;
+      // Debugging
+      /*
+      Serial.print("WArr: ");
+      for (int i=0; i<5; i++) {
+        Serial.print(weightMeasures[i],5);
+        Serial.print(", ");
       }
-      if (validCount > 0) {
-        measurement.weight = sum / validCount;
-      } else {
-        measurement.weight = -1;
-      }
+      Serial.println(measurement.stddev);
+      */
     }
 
     if (timeForTemp > 0 && now > timeForTemp) {
@@ -255,17 +259,17 @@ void loop() {
           measurement.temperature = TempSensor.temperature;
           measurement.humidity = TempSensor.humidity;
           break;
-        case DHTLIB_ERROR_CHECKSUM: 
-        case DHTLIB_ERROR_TIMEOUT: 
+        case DHTLIB_ERROR_CHECKSUM:
+        case DHTLIB_ERROR_TIMEOUT:
         case DHTLIB_ERROR_CONNECT:
         case DHTLIB_ERROR_ACK_L:
         case DHTLIB_ERROR_ACK_H:
-          measurement.temperature = -1;
-          measurement.humidity = -1;
+          //measurement.temperature = -1;
+          //measurement.humidity = -1;
           break;
         default: 
-          measurement.temperature = -2;
-          measurement.humidity = -2;
+          //measurement.temperature = -2;
+          //measurement.humidity = -2;
           break;
       }
       timeForTemp = now + tempInterval;
@@ -286,24 +290,27 @@ void loop() {
     // if no card is present and we were reporting,
     // check if we are over the threshold, then stop
     if( stopTare > 0 && now >= stopTare) {
+      //Serial.println("Tare stopped");
       shallBeStopped = true;
     }
 
     // if the rfid was removed, stop reporting
     if (shallBeStopped) {
+      //Serial.println("Shall be stopped");
       // reset counters
       isReporting = false;
-      nextReportMillis = 0;
       shallBeStopped = false;
+      nextReportMillis = 0;
       stopTare = 0;
       timeForTemp = 0;
 
       // reset data structure
       measurement.rfid[0] = '\0';
       measurement.weight = 0;
+      measurement.stddev = 0;
+      measurement.calibrationFactor = 0;
       measurement.temperature = 0;
       measurement.humidity = 0;
-
       clearWeightArray();
 
       // send empty message after some time
@@ -312,5 +319,5 @@ void loop() {
     }
   }
   // loop delay
-  delay(100);
+  delay(50);
 }

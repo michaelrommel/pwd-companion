@@ -31,7 +31,7 @@ bool ScaleProtocol::available() {
 // send the car detection for a heat, that has been set up (argument if the lane was wrong)
 void ScaleProtocol::sendMeasurement( const ScaleMeasurement* measurement )
 {
-  const uint16_t capacity = JSON_OBJECT_SIZE(4) + 250;
+  const uint16_t capacity = JSON_OBJECT_SIZE(6) + 250;
   StaticJsonBuffer<capacity> jsonBuffer;
 
   //SerialUSB.print( F("JSON Size: ") );
@@ -39,6 +39,8 @@ void ScaleProtocol::sendMeasurement( const ScaleMeasurement* measurement )
   JsonObject& root = jsonBuffer.createObject();
   root["rfid"] = measurement->rfid;
   root["wght"] = measurement->weight;
+  root["sdev"] = measurement->stddev;
+  root["cal"] = measurement->calibrationFactor;
   root["temp"] = measurement->temperature;
   root["hum"] = measurement->humidity;
   root.printTo( _hwser );
@@ -54,7 +56,7 @@ bool ScaleProtocol::receiveCommand( ScaleCommand* cmd )
   uint16_t countRead;
   uint16_t calibrationWeight;
 
-  const uint16_t capacity = JSON_OBJECT_SIZE(4) + 320;
+  const uint16_t capacity = JSON_OBJECT_SIZE(2) + 320;
   StaticJsonBuffer<capacity> jsonBuffer;
 
   countRead = _hwser.readBytesUntil('\n', incomingBytes, len);

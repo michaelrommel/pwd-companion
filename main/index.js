@@ -91,6 +91,8 @@ const setupApplication = () => {
       event.reply('serialport-message', JSON.stringify(arg, null, 0))
     } else if (arg.type === 'set') {
       startSerialReader(arg.port)
+    } else if (arg.type === 'close') {
+      port.close()
     } else if (arg.type === 'cmd') {
       port.write(JSON.stringify(arg.data))
       logger.debug('%s::serialport-message: %s', MODULE_ID, JSON.stringify(arg.data))
@@ -104,33 +106,83 @@ const setupApplication = () => {
 
 const startSerialReader = (newport) => {
   // set the requested port
+  logger.debug('%s::startSerialReader: try to open port "%s"',
+    MODULE_ID, newport)
+
+  if (port) {
+    // there is already an allocated port object
+    if (port.isOpen) {
+      logger.debug('%s::startSerialReader: closing already opened port "%s"',
+        MODULE_ID, newport)
+      port.close()
+    }
+  }
+
   try {
     port = new SerialPort(
       newport,
       { 'baudRate': 57600,
         'dataBits': 8,
         'parity': 'none',
-        'stopBits': 1
+        'stopBits': 1,
+        'autoOpen': false
       }
     )
-    parser = port.pipe(new Readline({ delimiter: '\n' }))
-
-    parser.on('data', (chunk) => {
-      logger.debug('%s::SerialReader: Received %d bytes of serial data',
-        MODULE_ID, chunk.length)
-      let serialData = JSON.parse(chunk)
-      measurement.setLastMeasurement(serialData)
-      let arg = {
-        'type': 'data',
-        'data': chunk
-      }
-      mainWindow.webContents.send('serialport-message',
-        JSON.stringify(arg, null, 0))
-    })
   } catch (err) {
-    logger.error('%s::startSerialReader:error opening serial port "%s"',
+    logger.error('%s::startSerialReader: could not open port "%s"',
       MODULE_ID, newport)
   }
+
+  if (!port.isOpen) {
+    try {
+      port.open()
+    } catch (err) {
+      logger.error('%s::startSerialReader: could not open port "%s"',
+        MODULE_ID, port)
+    }
+  }
+
+  port.on('open', () => {
+    try {
+      parser = port.pipe(new Readline({ delimiter: '\n' }))
+
+      parser.on('data', (chunk) => {
+        // logger.debug('%s::SerialReader: Received %d bytes of serial data',
+        //   MODULE_ID, chunk.length)
+        try {
+          let serialData = JSON.parse(chunk)
+          // logger.debug('%s::onData: received data: %s',
+          //   MODULE_ID, JSON.stringify(serialData, null, 2))
+          if (serialData.rfid !== undefined && serialData.wght !== undefined) {
+            // logger.debug('%s::onData: got measurement', MODULE_ID)
+            // at least the structure is a valid measurement report
+            if (serialData.rfid === '') serialData.rfid = '-'
+            // lets get a better readable fielname
+            serialData.weight = serialData.wght
+            delete serialData.wght
+            measurement.setLastMeasurement(serialData)
+            // send that data on to the renderer process
+            let arg = {
+              'type': 'data',
+              'data': serialData
+            }
+            mainWindow.webContents.send('serialport-message',
+              JSON.stringify(arg, null, 0))
+          }
+        } catch (err) {
+          logger.error('%s::onData: error parsing data: %s',
+            MODULE_ID, chunk)
+        }
+      })
+    } catch (err) {
+      logger.error('%s::startSerialReader: error opening serial port "%s"',
+        MODULE_ID, newport)
+    }
+  })
+
+  port.on('close', () => {
+    logger.error('%s::startSerialReader: port closed', MODULE_ID)
+  })
 }
 
 app.on('ready', setupApplication)

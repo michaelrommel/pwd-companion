@@ -45,6 +45,15 @@ const sendNewPortToMain = (port) => {
   console.log('App::sendNewPortToMain: sent set port request', arg.port)
 }
 
+const sendClosePortToMain = (port) => {
+  let arg = {
+    'type': 'close',
+    'port': port
+  }
+  ipcRenderer.send('serialport-message', JSON.stringify(arg, null, 2))
+  console.log('App::sendClosePortToMain: sent close port request', arg.port)
+}
+
 const sendTareToMain = () => {
   let arg = {
     'type': 'cmd',
@@ -161,6 +170,14 @@ class App extends Component {
     )
     // saves if component has a chance to unmount
     this.saveStateHandler()
+    // try to close the serial port
+    sendClosePortToMain()
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    if (prevState.zoomFactor !== this.state.zoomFactor) {
+      webFrame.setZoomFactor(this.state.zoomFactor)
+    }
   }
 
   saveStateHandler = () => {
@@ -195,17 +212,14 @@ class App extends Component {
   }
 
   pushData = (data) => {
-    // data is the raw string from the serial port
-    try {
-      let parsedData = JSON.parse(data)
-      if (parsedData.rfid === '') parsedData.rfid = '-'
-      // lets get a better readable fielname
-      parsedData.weight = parsedData.wght
-      delete parsedData.wght
-      logger.debug('App::pushData: got serial data', parsedData)
-      this.setState({ 'serialdata': parsedData })
-    } catch (err) {
-      logger.error('App::pushData: could not parse serial data')
+    if (data.rfid === '') data.rfid = '-'
+    logger.debug('App::pushData: got serial data', data)
+    // small visual change: compare the standard deviation
+    // of the new data against a threshold and update state
+    // only if the weight measurement has settled or car has
+    // been removed
+    if (data.sdev < 2 || data.rfid === '-') {
+      this.setState({ 'serialdata': data })
     }
   }
 

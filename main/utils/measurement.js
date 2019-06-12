@@ -10,7 +10,7 @@ const getLastMeasurement = () => {
 
 // function to store the last serial data
 const setLastMeasurement = (serialdata) => {
-  logger.debug('measurement::setLastMeasurmeent: storing last data')
+  // logger.debug('measurement::setLastMeasurmeent: storing last data')
   serialData = serialdata
 }
 

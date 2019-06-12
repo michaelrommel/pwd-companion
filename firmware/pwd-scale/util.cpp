@@ -14,4 +14,42 @@ namespace Util
       result[2 * i + 1] = hexmap[data[i] & 0x0F];
     }
   }
+
+  float getAverage(float val[], int len) {
+    float sum = 0;
+    int validCount = 0;
+    for (int i = 0; i < len; i++) {
+      if (val[i] != -1) {
+        // seems a valid measurement
+        sum = sum + val[i];
+        validCount++;
+      }
+    }
+    if (validCount > 0) {
+      return sum / (float)validCount;
+    } else {
+      return -1;
+    }
+  }
+
+  float getStdDeviation(float val[], int len) {
+    float avg = getAverage(val, len);
+    float sumSqares = 0;
+    int validCount = 0;
+    for (int i = 0; i < len; i++) {
+      if (val[i] != -1) {
+        // seems a valid measurement
+        sumSqares = sumSqares + (val[i] - avg) * (val[i] - avg);
+        validCount++;
+      }
+    }
+
+    if (validCount > 0) {
+      float variance = sumSqares / (float)validCount;
+      return sqrt(variance);
+    } else {
+      return -1;
+    }
+  }
+
 }

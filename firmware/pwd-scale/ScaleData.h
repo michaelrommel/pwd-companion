@@ -8,6 +8,8 @@
 typedef struct {
   char* rfid;
   float weight;
+  float stddev;
+  float calibrationFactor;
   float temperature;
   float humidity;
 } ScaleMeasurement;
