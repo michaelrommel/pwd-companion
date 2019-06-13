@@ -15,7 +15,9 @@ const setupMessaging = (props) => {
     setIp
   } = props
 
-  ipcRenderer.on('serialport-message', (event, msg) => {
+  let arg
+
+  ipcRenderer.on('main-message', (event, msg) => {
     let arg = JSON.parse(msg)
     if (arg.type === 'serialportList') {
       changePortList(arg.portNames)
@@ -31,9 +33,15 @@ const setupMessaging = (props) => {
     }
   })
 
-  let arg = { 'type': 'query' }
-  ipcRenderer.send('serialport-message', JSON.stringify(arg, null, 2))
+  // send message to query available serial ports
+  arg = { 'type': 'query-serialports' }
+  ipcRenderer.send('renderer-message', JSON.stringify(arg, null, 2))
   console.log('App::setupMessaging: requested portlist')
+
+  // send another to query about our IP address
+  arg = { 'type': 'query-ip' }
+  ipcRenderer.send('renderer-message', JSON.stringify(arg, null, 2))
+  console.log('App::setupMessaging: requested ip address')
 }
 
 const sendNewPortToMain = (port) => {
@@ -41,7 +49,7 @@ const sendNewPortToMain = (port) => {
     'type': 'set',
     'port': port
   }
-  ipcRenderer.send('serialport-message', JSON.stringify(arg, null, 2))
+  ipcRenderer.send('renderer-message', JSON.stringify(arg, null, 2))
   console.log('App::sendNewPortToMain: sent set port request', arg.port)
 }
 
@@ -50,7 +58,7 @@ const sendClosePortToMain = (port) => {
     'type': 'close',
     'port': port
   }
-  ipcRenderer.send('serialport-message', JSON.stringify(arg, null, 2))
+  ipcRenderer.send('renderer-message', JSON.stringify(arg, null, 2))
   console.log('App::sendClosePortToMain: sent close port request', arg.port)
 }
 
@@ -61,7 +69,7 @@ const sendTareToMain = () => {
       'c': 't'
     }
   }
-  ipcRenderer.send('serialport-message', JSON.stringify(arg, null, 2))
+  ipcRenderer.send('renderer-message', JSON.stringify(arg, null, 2))
   console.log('App::sendTareToMain: sent tare command')
 }
 
@@ -73,7 +81,7 @@ const sendCalibrationToMain = () => {
       'w': 142
     }
   }
-  ipcRenderer.send('serialport-message', JSON.stringify(arg, null, 2))
+  ipcRenderer.send('renderer-message', JSON.stringify(arg, null, 2))
   console.log('App::sendCalibrationToMain: sent calibration command')
 }
 

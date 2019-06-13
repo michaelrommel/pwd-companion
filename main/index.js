@@ -22,7 +22,7 @@ const sendMyIp = () => {
       'type': 'networkinfo',
       'ip': ip
     }
-    mainWindow.webContents.send('serialport-message',
+    mainWindow.webContents.send('main-message',
       JSON.stringify(arg, null, 0))
   })
 }
@@ -72,10 +72,10 @@ const setupApplication = () => {
   // create initial window
   createWindow()
   // set up interprocess communication
-  ipcMain.on('serialport-message', async (event, msg) => {
-    logger.info('%s::serialport-message: received renderer-msg: %s', MODULE_ID, msg)
+  ipcMain.on('renderer-message', async (event, msg) => {
+    logger.info('%s::renderer-message: received renderer-msg: %s', MODULE_ID, msg)
     let arg = JSON.parse(msg)
-    if (arg.type === 'query') {
+    if (arg.type === 'query-serialports') {
       // render process requests refreshing the list of serial ports
       let portList = await SerialPort.list()
       let portNames = portList.map((port) =>
@@ -88,20 +88,21 @@ const setupApplication = () => {
         'type': 'serialportList',
         'portNames': portNames
       }
-      event.reply('serialport-message', JSON.stringify(arg, null, 0))
+      event.reply('main-message', JSON.stringify(arg, null, 0))
+    } else if (arg.type === 'query-ip') {
+      sendMyIp()
     } else if (arg.type === 'set') {
       startSerialReader(arg.port)
     } else if (arg.type === 'close') {
       port.close()
     } else if (arg.type === 'cmd') {
       port.write(JSON.stringify(arg.data))
-      logger.debug('%s::serialport-message: %s', MODULE_ID, JSON.stringify(arg.data))
+      logger.debug('%s::renderer-message: %s', MODULE_ID, JSON.stringify(arg.data))
     }
   })
   // set up websocket endpoiint and basic REST server
   logger.info('main::setupApplication: starting network services')
   network.init(ctx)
-  sendMyIp()
 }
 
 const startSerialReader = (newport) => {
@@ -166,7 +167,7 @@ const startSerialReader = (newport) => {
               'type': 'data',
               'data': serialData
             }
-            mainWindow.webContents.send('serialport-message',
+            mainWindow.webContents.send('main-message',
               JSON.stringify(arg, null, 0))
           }
         } catch (err) {
