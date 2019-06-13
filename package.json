@@ -2,7 +2,7 @@
   "name": "pwd-companion",
   "description": "A companion application for pwd-racemanager",
   "author": "Michael Rommel",
-  "version": "0.2.1-beta",
+  "version": "0.2.2-beta",
   "license": "MIT",
   "repository": "github:michaelrommel/pwd-companion",
   "private": false,
@@ -70,7 +70,7 @@
   "build": {
     "appId": "com.michaelrommel.pwd-companion",
     "productName": "pwd-companion",
-    "copyright": "(c) 2019 by {author}",
+    "copyright": "(c) 2019 by Michael Rommel",
     "generateUpdatesFilesForAllChannels": true,
     "directories": {
       "buildResources": "assets"
