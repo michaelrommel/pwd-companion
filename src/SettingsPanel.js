@@ -30,8 +30,8 @@ const SerialportSelector = (props) => {
       'path': './scale-vehicles.plain.svg'
     },
     {
-      'label': 'People',
-      'path': './scale-people.plain.svg'
+      'label': 'Medical',
+      'path': './scale-medical.plain.svg'
     }
   ]
 

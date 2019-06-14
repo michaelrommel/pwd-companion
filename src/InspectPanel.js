@@ -61,12 +61,12 @@ class InspectPanel extends Component {
   scaleRotation = (weight) => {
     console.log('InspectPanel::scaleRotaton: new weight is', weight)
     let rotation
-    if (weight < 120) {
+    if (weight < 105) {
       rotation = 0
     } else if (weight > 150) {
-      rotation = 180
+      rotation = -270
     } else {
-      rotation = -1 * Math.round(((weight - 120) * 6) * 10) / 10
+      rotation = -1 * Math.round(((weight - 105) * 6) * 10) / 10
     }
     return rotation
   }
