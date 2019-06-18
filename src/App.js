@@ -118,6 +118,7 @@ class App extends Component {
     }
     this.dontrestore = [
       'environment',
+      'version',
       'urlprefix',
       'serialportList',
       'serialdata'
@@ -260,6 +261,7 @@ class App extends Component {
           darktheme={this.state.darktheme}
           panelId={this.state.panelId}
           ip={this.state.ip}
+          version={this.state.version}
         />
         <Panels
           panelId={this.state.panelId}

@@ -2,7 +2,7 @@
   "name": "pwd-companion",
   "description": "A companion application for pwd-racemanager",
   "author": "Michael Rommel",
-  "version": "0.2.3-beta",
+  "version": "0.2.4-beta",
   "license": "MIT",
   "repository": "github:michaelrommel/pwd-companion",
   "private": false,
@@ -116,10 +116,10 @@
     "react-eject": "react-scripts eject",
     "react-devtools": "react-devtools",
     "electron-build": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false CSC_NAME=\"Michael Rommel (QLZ6Q6Z89R)\" electron-builder",
-    "release": "yarn run react-build && electron-builder",
-    "build": "yarn run react-build && yarn run electron-build",
+    "build": "yarn run react-build",
+    "release": "yarn run react-build && yarn run electron-build",
     "start": "concurrently \"cross-env BROWSER=none yarn run react-start\" \"electron .\"",
-    "github": "yarn run electron-build --publish always"
+    "github": "yarn run react-build && yarn run electron-build --publish always"
   },
   "browserslist": [
     ">0.2%",

@@ -12,6 +12,10 @@
   margin-bottom: 0;
 }
 
+.appversion {
+  font-size: 50%
+}
+
 /* The classes for the Navigation Panel */
 .navigation-button {
   margin: 0px 2px 0px 2px;

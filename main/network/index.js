@@ -17,7 +17,8 @@ let server = restify.createServer(options)
 const cors = corsplugin({
   preflightMaxAge: 5,
   origins: [
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'https://pwd-racetrack.michaelrommel.com'
   ],
   allowHeaders: ['Authorization'],
   exposeHeaders: ['Authorization']

@@ -15,7 +15,8 @@ class Navigation extends Component {
       <Navbar className={this.props.className}>
         <Navbar.Group className='navigation'>
           <Navbar.Heading>
-            <strong>pwd-companion</strong>
+            <div><strong>pwd-companion</strong></div>
+            <div className='appversion'><em>({this.props.version})</em></div>
           </Navbar.Heading>
           <Navbar.Divider />
           <Button id='inspect' onClick={this.toInspect} className='navigation-button'
