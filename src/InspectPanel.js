@@ -73,10 +73,14 @@ class InspectPanel extends Component {
 
   render () {
     const panelActive = this.props.active ? {} : { 'display': 'none' }
-    const rfid = this.props.serialdata ? this.props.serialdata.rfid : '-'
-    const weight = this.props.serialdata ? this.props.serialdata.weight : 0
-    const temperature = this.props.serialdata ? Math.round(this.props.serialdata.temp, 0) : 0
     const scaleIcon = <span className='bp3-icon'><FaBalanceScale size='0.8em' /></span>
+    const rfid = this.props.serialdata ? this.props.serialdata.rfid : '-'
+    const temperature = this.props.serialdata
+      ? Math.round(this.props.serialdata.temp, 0)
+      : 0
+    const weight = this.props.serialdata
+      ? Math.round(this.props.serialdata.weight * 100) / 100
+      : 0
 
     const weightTitle = 'Weight' + (
       (temperature > 0)

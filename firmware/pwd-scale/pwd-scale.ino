@@ -39,10 +39,10 @@ const unsigned long reportingInterval = 500;
 const unsigned long maxTimeOn = 20000;
 // after which many seconds to stop reporting after tare or calibration
 // if no rfid can be detected
-const unsigned long maxReporting  = 60000;
+const unsigned long maxReporting  = 40000;
 // number of milliseconds, after which reporting of a removed rfid
 // shall stop
-const unsigned long maxRfidGraceTime = 60000;
+const unsigned long maxRfidGraceTime = 40000;
 // threshold for card removal
 const int removalThreshold = 2;
 // flag if the previous rfid detection was true or false
@@ -215,7 +215,7 @@ void loop() {
     }
   }
 
-  if (!rfidIsPresent && (now > stopGraceReporting)) {
+  if (!rfidIsPresent && stopGraceReporting > 0 && now > stopGraceReporting) {
     // reset continuous reporting
     shallBeStopped = true;
     stopTare = 0;

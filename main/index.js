@@ -42,10 +42,8 @@ autoUpdater.logger = logger
 function createWindow () {
   autoUpdater.checkForUpdatesAndNotify()
   mainWindow = new BrowserWindow(
-    // { width: 2200,
-    //   height: 1300,
-    { width: 768,
-      height: 480,
+    { width: 1920,
+      height: 1080,
       minwidth: 768,
       minheight: 480,
       show: true,
