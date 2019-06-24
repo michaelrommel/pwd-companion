@@ -40,6 +40,9 @@ const unsigned long maxTimeOn = 20000;
 // after which many seconds to stop reporting after tare or calibration
 // if no rfid can be detected
 const unsigned long maxReporting  = 60000;
+// number of milliseconds, after which reporting of a removed rfid
+// shall stop
+const unsigned long maxRfidGraceTime = 60000;
 // threshold for card removal
 const int removalThreshold = 2;
 // flag if the previous rfid detection was true or false
@@ -62,6 +65,8 @@ unsigned long stopTare = 0;
 unsigned long stopCell = 0;
 // time for next temperature reading
 unsigned long timeForTemp = 0;
+// time when the rfid grace period ends
+unsigned long stopGraceReporting = 0;
 
 void PrintHex(byte *buffer, byte bufferSize) {
   for (byte i = 0; i < bufferSize; i++) {
@@ -169,11 +174,8 @@ void loop() {
         // reset counters
         rfidIsPresent = false;
         removalCounter = 0;
-        // reset continuous reporting
-        shallBeStopped = true;
-        stopTare = 0;
-        // stop loadcell
-        stopCell = now - 1;
+        // set up grae period
+        stopGraceReporting = now + maxRfidGraceTime;
         //Serial.println("stopping bc rfid removal");
       }
       previousDetection = false;
@@ -201,6 +203,8 @@ void loop() {
         removalCounter = 0;
         shallBeStopped = false;
         stopTare = 0;
+        // reset grace reporting timer
+        stopGraceReporting = 0;
         // remember time to stop the loadcell
         stopCell = now + maxTimeOn;
         // set time for temperature readings
@@ -209,6 +213,15 @@ void loop() {
         //Serial.println(shallBeStopped);
       }
     }
+  }
+
+  if (!rfidIsPresent && (now > stopGraceReporting)) {
+    // reset continuous reporting
+    shallBeStopped = true;
+    stopTare = 0;
+    // stop loadcell
+    stopCell = now - 1;
+    stopGraceReporting = 0;
   }
 
   // check if we should be still report
